@@ -3,7 +3,7 @@ package com.xu.gege.fragment;
 /**
  * @Author: KaixuGege
  * Time:           2019/5/7
- * ProjectName:    XuFragment
+ * ProjectName:    XuLazyFragment
  * ClassName:
  * Info:
  */

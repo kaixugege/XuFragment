@@ -1,40 +1,54 @@
-package com.xugege.xufragment;
+package com.xu.gege.fragment.frg;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.xu.gege.fragment.frg.XuFragment;
-
 /**
  * @Author: KaixuGege
- * Time:           2019/5/7
+ * Time:           2019/5/8
  * ProjectName:    XuFragment
  * ClassName:
  * Info:
  */
-public abstract class BaseFragment extends XuFragment {
+public abstract class XuBaseFragment extends XuLazyFragment {
 
-    private static final String TAG = "BaseFragment";
+    private View rootView = null;
+    private ICreatView iCreatView = null;
 
+    public abstract Object setLayout();
+
+    @Nullable
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        Log.d(TAG,"setUserVisibleHint "+isVisibleToUser);
+        if (rootView == null) {
+
+            if (setLayout() == null) {
+                throw new RuntimeException("XU: The setLayout not be null.");
+            } else if (setLayout() instanceof Integer) {
+                rootView = inflater.inflate((Integer) setLayout(), container, false);
+            } else if (setLayout() instanceof View) {
+                rootView = (View) setLayout();
+            }
+            if (iCreatView != null) iCreatView.created(rootView);
+
+        } else {
+
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null) {
+                parent.removeView(rootView);
+            }
+
+        }
+        return rootView;
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-    }
-
 
 
     @Override
@@ -78,7 +92,4 @@ public abstract class BaseFragment extends XuFragment {
         super.onStop();
         Log.d(TAG, "onStop");
     }
-
-
 }
-

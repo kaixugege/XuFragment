@@ -4,10 +4,13 @@ import android.support.v4.app.Fragment;
 
 /**
  * @Author: KaixuGege
- * Time:           2019/5/7
+ * Time:           2019/5/8
  * ProjectName:    XuFragment
  * ClassName:
  * Info:
  */
-public abstract class XuFragment extends Fragment {
+public class BaseFragment extends Fragment {
+
+    public final String TAG = XuLazyFragment.class.getSimpleName();
+
 }

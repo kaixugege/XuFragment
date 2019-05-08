@@ -7,26 +7,32 @@
     tools:context=".Main2Activity">
 
     <android.support.design.widget.TabLayout
+        android:id="@+id/tab"
         android:layout_width="match_parent"
         android:layout_height="54dp">
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="54dp"
+            android:id="@+id/tab_mondy"
             android:text="Monday" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="54dp"
+            android:id="@+id/tab_tuesday"
             android:text="Tuesday" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="54dp"
+            android:id="@+id/tab_wednesday"
             android:text="Wednesday" />
+
     </android.support.design.widget.TabLayout>
 
     <android.support.v4.view.ViewPager
+        android:id="@+id/vp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></android.support.v4.view.ViewPager>
 </LinearLayout>
