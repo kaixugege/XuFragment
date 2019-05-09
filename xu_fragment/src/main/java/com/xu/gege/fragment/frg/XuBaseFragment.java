@@ -1,11 +1,9 @@
 package com.xu.gege.fragment.frg;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +15,11 @@ import android.view.ViewGroup;
  * ClassName:
  * Info:
  */
-public abstract class XuBaseFragment extends XuLazyFragment {
+public abstract class XuBaseFragment extends BaseFragment {
 
     private View rootView = null;
-    private ICreatView iCreatView = null;
 
-    public abstract Object setLayout();
+    public abstract Object getLayout();
 
     @Nullable
     @Override
@@ -30,66 +27,66 @@ public abstract class XuBaseFragment extends XuLazyFragment {
 
         if (rootView == null) {
 
-            if (setLayout() == null) {
+            if (getLayout() == null) {
                 throw new RuntimeException("XU: The setLayout not be null.");
-            } else if (setLayout() instanceof Integer) {
-                rootView = inflater.inflate((Integer) setLayout(), container, false);
-            } else if (setLayout() instanceof View) {
-                rootView = (View) setLayout();
+            } else if (getLayout() instanceof Integer) {
+                rootView = inflater.inflate((Integer) getLayout(), container, false);
+            } else if (getLayout() instanceof View) {
+                rootView = (View) getLayout();
             }
-            if (iCreatView != null) iCreatView.created(rootView);
-
+            onBindView(rootView);
         } else {
-
             ViewGroup parent = (ViewGroup) rootView.getParent();
             if (parent != null) {
                 parent.removeView(rootView);
             }
-
         }
         return rootView;
     }
 
+    abstract public void onBindView(View rootView);
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "onAttach");
-    }
+//
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        Log.d(TAG, "onAttach");
+//    }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        Log.d(TAG, "onPause");
+//    }
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        Log.d(TAG, "onStart");
+//    }
+//
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        Log.d(TAG, "onDestroy");
+//    }
+//
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        Log.d(TAG, "onDestroyView");
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.d(TAG, "onResume");
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        Log.d(TAG, "onStop");
+//    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(TAG, "onDestroyView");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-    }
 }

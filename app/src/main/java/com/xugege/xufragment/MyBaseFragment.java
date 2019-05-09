@@ -2,6 +2,7 @@ package com.xugege.xufragment;
 
 
 import com.xu.gege.fragment.frg.XuBaseFragment;
+import com.xu.gege.fragment.frg.XuLazyFragment;
 
 /**
  * @Author: KaixuGege
@@ -10,6 +11,6 @@ import com.xu.gege.fragment.frg.XuBaseFragment;
  * ClassName:
  * Info:
  */
-public abstract class MyBaseFragment extends XuBaseFragment {
+public abstract class MyBaseFragment extends XuLazyFragment {
 }
 

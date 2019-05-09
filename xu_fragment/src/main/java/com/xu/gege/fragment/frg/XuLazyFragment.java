@@ -1,15 +1,10 @@
 package com.xu.gege.fragment.frg;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 /**
  * @Author: KaixuGege
@@ -18,7 +13,17 @@ import android.view.ViewGroup;
  * ClassName:
  * Info:
  */
-public abstract class XuLazyFragment extends BaseFragment {
+public abstract class XuLazyFragment extends XuBaseFragment {
+
+    public boolean isStartLazy() {
+        return isStartLazy;
+    }
+
+    public void setStartLazy(boolean startLazy) {
+        isStartLazy = startLazy;
+    }
+
+    public boolean isStartLazy = true;//是否开启懒加载，默认开启
 
     protected boolean isFist = true;//是否第一次登陆，默认第一次进入
     private boolean isReuseView = true;//是否进行复用，默认复用
@@ -26,9 +31,8 @@ public abstract class XuLazyFragment extends BaseFragment {
 
     private View rootView = null;
 
-    private ILoaderData iLoaderData;
 
-    public abstract ILoaderData setILoader();
+    abstract public ILazyLoda setILoader();
 
 
     @Override
@@ -36,31 +40,41 @@ public abstract class XuLazyFragment extends BaseFragment {
         super.setUserVisibleHint(isVisibleToUser);
         //setUserVisibleHint()有可能在fragment的生命周期外被调用
 
-        if (rootView == null) return;
+        if (!isStartLazy()) return;//如果没有开启直接返回
+
+        if (rootView == null) {
+            Log.d(TAG, "rootView" + " = null" + "返回");
+            return;
+        } else {
+            Log.d(TAG, "rootView" + " != null");
+        }
 
         if (isFist && isVisibleToUser) {
-
-            //如果第一次进入并且可见的
-            onFragmentFirstVisible();//回调当前fragment首次可见
-            iLoaderData = setILoader();
-            if (iLoaderData != null) iLoaderData.startLoad();
+            Log.d(TAG, "isFist = " + isFist + " isVisibleToUser=" + isVisibleToUser + "  这里是第一次进入了，所以调用onFragment");
+            setILoader().onFragmentFirstVisible(); //如果第一次进入并且可见的//回调当前fragment首次可见
+            if (setILoader() != null) setILoader().onFragmentVisibleChange(isVisibleToUser);
             isFist = false;//这里把首次可见给关闭
+        } else {
+            Log.d(TAG, "isFist = " + isFist + " isVisibleToUser=" + isVisibleToUser);
         }
 
         //如果只是可见，不是首次可见
-        if(isVisibleToUser){
+        if (isVisibleToUser) {
             isFragmentVisible = true;
-            onFragmentVisibleChange(isFragmentVisible);//回调当前fragment可见
-
+            Log.d(TAG, "isVisibleToUser = " + isVisibleToUser + " 这里只是可见 ");
+            setILoader().onFragmentVisibleChange(isFragmentVisible);//回调当前fragment可见
             return;
+        } else {
+            Log.d(TAG, "isVisibleToUser = " + isVisibleToUser);
         }
 
-        if(isFragmentVisible){
+        if (isFragmentVisible) {
             //如果当前fragment不可见且标识位true
             isFragmentVisible = false;//更改标识
-            onFragmentVisibleChange(isFragmentVisible);//回调当前fragment不可见
+            setILoader().onFragmentVisibleChange(isFragmentVisible);//回调当前fragment不可见
+        } else {
+            Log.d(TAG, "isFragmentVisible = " + isFragmentVisible);
         }
-
 
     }
 
@@ -68,47 +82,33 @@ public abstract class XuLazyFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        //如果setUserVisibleHint()在rootView创建前调用时，那么
-        //就等到rootView创建完后才回调onFragmentVisibleChange(true)
-        //保证onFragmentVisibleChange()的回调发生在rootView创建完成之后，以便支持ui操作
-        if (rootView == null) {
-            rootView = view;
+        //开启了懒加载
+        if (isStartLazy()) {
 
-            //这个函数判断 fragment 是否可见的
-            if (getUserVisibleHint()) {
-                if (isFist) {
-                    onFragmentFirstVisible();
-                    isFist = false;
+            //如果setUserVisibleHint()在rootView创建前调用时，那么
+            //就等到rootView创建完后才回调onFragmentVisibleChange(true)
+            //保证onFragmentVisibleChange()的回调发生在rootView创建完成之后，以便支持ui操作
+            if (rootView == null) {
+
+                rootView = view;
+                //这个函数判断 fragment 是否可见的
+                if (getUserVisibleHint()) {
+                    if (isFist) {
+                        Log.d(TAG, "onViewCreated isFist= " + isFist);
+                        if (setILoader() != null) setILoader().onFragmentFirstVisible();
+                        isFist = false;
+                    }
+                    setILoader().onFragmentVisibleChange(true);
+                    isFragmentVisible = true;//设置fragment可见
                 }
-                onFragmentVisibleChange(true);
-                isFragmentVisible = true;//设置fragment可见
             }
+            super.onViewCreated(isReuseView ? rootView : view, savedInstanceState);
+        } else {
+            //没有开启懒加载
+            super.onViewCreated(view, savedInstanceState);
         }
 
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    /**
-     * 在fragment首次可见时回调，可在这里进行加载数据，保证只在第一次打开Fragment时才会加载数据，
-     * 这样就可以防止每次进入都重复加载数据
-     * 该方法会在 onFragmentVisibleChange() 之前调用，所以第一次打开时，可以用一个全局变量表示数据下载状态，
-     * 然后在该方法内将状态设置为下载状态，接着去执行下载的任务
-     * 最后在 onFragmentVisibleChange() 里根据数据下载状态来控制下载进度ui控件的显示与隐藏
-     */
-    protected void onFragmentFirstVisible() {
 
     }
 
-    /**
-     * 去除setUserVisibleHint()多余的回调场景，保证只有当fragment可见状态发生变化时才回调
-     * 回调时机在view创建完后，所以支持ui操作，解决在setUserVisibleHint()里进行ui操作有可能报null异常的问题
-     * <p>
-     * 可在该回调方法里进行一些ui显示与隐藏，比如加载框的显示和隐藏
-     *
-     * @param isVisible true  不可见 -> 可见
-     *                  false 可见  -> 不可见
-     */
-    protected void onFragmentVisibleChange(boolean isVisible) {
-
-    }
 }
